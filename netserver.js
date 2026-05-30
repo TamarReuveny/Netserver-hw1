@@ -2,10 +2,6 @@ const net = require('net');
 const fs = require('fs');
 const path = require('path');
 
-// ─────────────────────────────────────────────
-//  MIME Types
-// ─────────────────────────────────────────────
-
 const MIME = {
   '.html': 'text/html',
   '.css': 'text/css',
@@ -38,11 +34,6 @@ const STATUS = {
   409: 'Conflict',
   500: 'Internal Server Error',
 };
-
-// ─────────────────────────────────────────────
-//  Request Parser
-// ─────────────────────────────────────────────
-
 function parseRequest(buffer) {
   const raw = buffer.toString();
   const separatorIndex = raw.indexOf('\r\n\r\n');
@@ -90,9 +81,6 @@ function parseRequest(buffer) {
   return { method, path: pathname, query, headers, body: parsedBody, version, params: {} };
 }
 
-// ─────────────────────────────────────────────
-//  Response Builder
-// ─────────────────────────────────────────────
 
 function createResponse(socket) {
   let code = 200;
@@ -163,9 +151,6 @@ function createResponse(socket) {
   return res;
 }
 
-// ─────────────────────────────────────────────
-//  Route Matcher
-// ─────────────────────────────────────────────
 
 function compileRoute(pattern) {
   const paramNames = [];
@@ -175,15 +160,10 @@ function compileRoute(pattern) {
   return { regex: new RegExp(`^${regexStr}$`), paramNames };
 }
 
-// ─────────────────────────────────────────────
-//  Prism Core
-// ─────────────────────────────────────────────
-
-function createPrism() {
+function createNetserver() {
   const routes = {};     // { METHOD: [{ regex, paramNames, handlers[] }] }
   const middleware = []; // global middleware stack
 
-  // ── Routing helpers ──────────────────────────
 
   function addRoute(method, pattern, ...handlers) {
     if (!routes[method]) routes[method] = [];
@@ -203,8 +183,6 @@ function createPrism() {
     }
     return null;
   }
-
-  // ── Static file serving ──────────────────────
 
   function serveStatic(urlPrefix, staticDir) {
     // Normalize: serveStatic('./public') or serveStatic('/assets', './public')
@@ -246,8 +224,6 @@ function createPrism() {
     };
   }
 
-  // ── Middleware runner ────────────────────────
-
   function runStack(stack, req, res, finalFn) {
     let i = 0;
     function next(err) {
@@ -258,8 +234,6 @@ function createPrism() {
     }
     next();
   }
-
-  // ── Request dispatcher ───────────────────────
 
   function dispatch(req, res) {
     runStack(middleware, req, res, () => {
@@ -276,7 +250,7 @@ function createPrism() {
     });
   }
 
-  // ── Public API ───────────────────────────────
+  // Public API
 
   const app = {
     // HTTP method shortcuts
@@ -340,19 +314,15 @@ function createPrism() {
   return app;
 }
 
-// ─────────────────────────────────────────────
-//  Bundled Middleware
-// ─────────────────────────────────────────────
-
-createPrism.json = () => (req, res, next) => next(); // JSON is parsed automatically
-createPrism.cors = (origin = '*') => (req, res, next) => {
+createNetserver.json = () => (req, res, next) => next(); // JSON is parsed automatically
+createNetserver.cors = (origin = '*') => (req, res, next) => {
   res.set('Access-Control-Allow-Origin', origin);
   res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(204).send('');
   next();
 };
-createPrism.logger = () => (req, res, next) => {
+createNetserver.logger = () => (req, res, next) => {
   const start = Date.now();
   const originalSend = res.send.bind(res);
   res.send = (...args) => {
@@ -362,4 +332,4 @@ createPrism.logger = () => (req, res, next) => {
   next();
 };
 
-module.exports = createPrism;
+module.exports = createNetserver;

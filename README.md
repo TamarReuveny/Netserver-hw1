@@ -1,10 +1,10 @@
-# ⬡ NetServer
+# ⬡ netserver
 
 A creative, minimal HTTP/1.1 framework built on Node.js's low-level `net` module — no `http`, no third-party libraries.
 
 ## Design Philosophy
 
-NetServer exposes an Express-like API while staying as small as possible. The core ideas:
+netserver exposes an Express-like API while staying as small as possible. The core ideas:
 
 - **Chainable** — `res.status(201).json(data)` reads like a sentence
 - **Middleware-first** — global and per-route stacks run in order, just like Express

@@ -1,22 +1,20 @@
-const prism = require('./netserver');
+const netserver = require('./netserver');
 
-const app = prism();
+const app = netserver();
 
-// ── Global middleware ─────────────────────────
-app.use(prism.logger());
-app.use(prism.cors());
+// Global middleware
+app.use(netserver.logger());
+app.use(netserver.cors());
 
-// ── Static files ──────────────────────────────
+// Static files
 app.use('/static', './public');
 
-// ── In-memory "database" ──────────────────────
+// In-memory "database" 
 let users = [
   { id: 1, name: 'Ido',   email: 'ido@example.com' },
   { id: 2, name: 'Tamar',     email: 'tamar@example.com'   },
 ];
 let nextId = 3;
-
-// ── Routes ────────────────────────────────────
 
 app.get('/', (req, res) => {
   res.redirect('/static/index.html');
@@ -64,7 +62,7 @@ app.delete('/api/users/:id', (req, res) => {
   res.json({ deleted: true, user: removed });
 });
 
-// ── Start ─────────────────────────────────────
+// Start the server
 app.listen(3000, (port) => {
-  console.log(`\n  NetServer server running → http://localhost:${port}\n`);
+  console.log(`\n  netserver running → http://localhost:${port}\n`);
 });
