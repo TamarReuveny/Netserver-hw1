@@ -6,9 +6,9 @@ A creative, minimal HTTP/1.1 framework built on Node.js's low-level `net` module
 
 netserver exposes an Express-like API while staying as small as possible. The core ideas:
 
-- **Chainable** — `res.status(201).json(data)` reads like a sentence
-- **Middleware-first** — global and per-route stacks run in order, just like Express
-- **Batteries included** — `netserver.cors()`, `netserver.logger()`, and static file serving ship out of the box
+- **Chainable** - `res.status(201).json(data)` reads like a sentence
+- **Middleware-first** - global and per-route stacks run in order, just like Express
+- **Batteries included** - `netserver.cors()`, `netserver.logger()`, and static file serving ship out of the box
 - **No magic** — every layer (TCP → HTTP parsing → routing → response) is visible and readable
 
 ## Usage
